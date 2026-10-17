@@ -12,7 +12,22 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest", "httpx"]
+dev = [
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools]
+packages = [
+    "app",
+    "app.api",
+    "app.core",
+    "app.db",
+    "app.models",
+    "app.schemas",
+    "app.services",
+    "app.workers",
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
