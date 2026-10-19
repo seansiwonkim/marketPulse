@@ -9,6 +9,10 @@ dependencies = [
     "alembic",
     "psycopg[binary]",
     "pydantic-settings",
+    "httpx",
+    "torch",
+    "transformers",
+    "vaderSentiment",
 ]
 
 [project.optional-dependencies]

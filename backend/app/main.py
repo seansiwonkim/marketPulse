@@ -4,10 +4,18 @@ from app.db.database import Base, engine
 from app.models.article import Article
 
 from app.db.database import engine, test_connection
+from app.api.routes.articles import router as articles_router
+from app.models.sentiment import SentimentScore
+from app.api.routes.sentiment import router as sentiment_router
+
+
 
 app = FastAPI(title="marketPulse")
 
 Base.metadata.create_all(bind=engine)  # Create tables if they don't exist
+
+app.include_router(articles_router)
+app.include_router(sentiment_router)
 
 @app.get("/")
 async def root():
