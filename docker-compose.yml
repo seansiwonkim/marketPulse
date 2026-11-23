@@ -1,8 +1,25 @@
+# Production-safe base. Local development adds docker-compose.override.yml automatically.
 services:
   api:
     build: ./backend
     env_file: .env
     ports: ["8000:8000"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # The daily pipeline (fetch news, score it). It carries torch + FinBERT, so it gets its own
+  # heavier image and the API image stays small. It only runs when asked for:
+  #   docker compose run --rm pipeline
+  pipeline:
+    build:
+      context: ./backend
+      args:
+        EXTRAS: ml
+    command: ["python", "-m", "app.workers.run_pipeline"]
+    env_file: .env
+    volumes: [hf_cache:/root/.cache/huggingface]  # keeps the ~440 MB FinBERT download between runs
+    profiles: ["pipeline"]
     depends_on:
       db:
         condition: service_healthy
@@ -20,3 +37,4 @@ services:
 
 volumes:
   pgdata:
+  hf_cache:

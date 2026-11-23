@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
@@ -9,6 +9,37 @@ from app.models.sentiment import SentimentScore
 
 router = APIRouter(prefix="/api/v1/stocks")
 
+@router.get("/{ticker}/sentiment/daily")
+def get_daily_sentiment(
+    ticker: str,
+    model: str = "ProsusAI/finbert",
+    db: Session = Depends(get_db),
+):
+    day = func.date(Article.published_at)
+
+    rows = db.execute(
+        select(
+            day.label("day"),
+            func.avg(SentimentScore.score).label("avg_score"),
+            func.count().label("article_count"),
+        )
+        .join(SentimentScore, SentimentScore.article_id == Article.id)
+        .where(
+            Article.ticker == ticker.upper(),
+            SentimentScore.model_name == model,
+        )
+        .group_by(day)
+        .order_by(day)
+    ).all()
+
+    return [
+        {
+            "date": r.day,
+            "avg_score": round(r.avg_score, 3),
+            "article_count": r.article_count,
+        }
+        for r in rows
+    ]
 
 @router.get("/{ticker}/sentiment")
 def get_sentiment(

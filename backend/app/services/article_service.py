@@ -35,8 +35,6 @@ def save_articles(
         db.flush()
         inserted += 1
 
-    db.add(article)
     db.commit()
-    db.refresh(article)
 
     return inserted

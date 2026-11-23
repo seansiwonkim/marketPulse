@@ -1,5 +1,7 @@
-# Secrets
+# Secrets (.env, .env.neon, .env.production, ...). Only the example file is committed.
 .env
+.env.*
+!.env.example
 
 # Python
 __pycache__/
