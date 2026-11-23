@@ -24,3 +24,27 @@ class ArticleResponse(ArticleBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class ModelResult(BaseModel):
+    """One model's verdict on one article.
+
+    The score scales differ, so don't compare numbers across models:
+      - FinBERT: positive probability minus negative probability (-1..1)
+      - VADER:   its compound score (-1..1)
+    """
+    model_name: str
+    label: str
+    score: float  # 0.0 means a balanced score, NOT "missing" (missing is None below)
+
+
+class ArticleWithSentiment(ArticleResponse):
+    """An article plus each model's result. None = not analyzed yet."""
+    finbert: ModelResult | None
+    vader: ModelResult | None
+
+
+class ArticlePage(BaseModel):
+    """One batch of articles. Pass next_cursor back to get the following batch."""
+    items: list[ArticleWithSentiment]
+    next_cursor: str | None  # None = no more articles
