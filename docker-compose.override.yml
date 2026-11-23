@@ -1,0 +1,11 @@
+# Development extras. Docker Compose merges this file in automatically for `docker compose up`.
+# In production, run `docker compose -f docker-compose.yml up -d` to skip it.
+services:
+  api:
+    build:
+      context: ./backend
+      args:
+        EXTRAS: dev  # adds pytest
+    volumes: ["./backend:/srv"]  # edit code on your Mac, see it in the container
+  pipeline:
+    volumes: ["./backend:/srv"]

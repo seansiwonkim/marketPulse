@@ -10,12 +10,15 @@ dependencies = [
     "psycopg[binary]",
     "pydantic-settings",
     "httpx",
+]
+
+[project.optional-dependencies]
+# Only the pipeline needs these. Keeping them out of the base list keeps the API image small.
+ml = [
     "torch",
     "transformers",
     "vaderSentiment",
 ]
-
-[project.optional-dependencies]
 dev = [
     "pytest",
     "httpx",
