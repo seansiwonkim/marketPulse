@@ -19,6 +19,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      # Fail in seconds with a clear message, instead of after a 10-minute install.
+      # A missing or misspelled secret reaches the job as an empty string.
+      - name: Check secrets are set
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          FINNHUB_API_KEY: ${{ secrets.FINNHUB_API_KEY }}
+        run: |
+          [ -n "$DATABASE_URL" ] || { echo "::error::The DATABASE_URL secret is empty or missing"; exit 1; }
+          [ -n "$FINNHUB_API_KEY" ] || { echo "::error::The FINNHUB_API_KEY secret is empty or missing"; exit 1; }
+          case "$DATABASE_URL" in
+            postgres://* | postgresql://* | postgresql+psycopg://*) ;;
+            *) echo "::error::DATABASE_URL must start with postgresql://"; exit 1 ;;
+          esac
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-python@v5

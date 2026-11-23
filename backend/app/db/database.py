@@ -4,9 +4,21 @@ import os
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+psycopg://marketpulse:password1@localhost:5432/marketpulse",
+def normalize_database_url(url: str) -> str:
+    """Hosted providers (Neon, Render, ...) give "postgresql://..." or "postgres://...".
+    SQLAlchemy needs the driver named explicitly, so add it here."""
+    url = url.strip()
+    for prefix in ("postgresql://", "postgres://"):
+        if url.startswith(prefix):
+            return "postgresql+psycopg://" + url[len(prefix):]
+    return url
+
+
+DATABASE_URL = normalize_database_url(
+    os.getenv(
+        "DATABASE_URL",
+        "postgresql+psycopg://marketpulse:password1@localhost:5432/marketpulse",
+    )
 )
 
 engine = create_engine(
